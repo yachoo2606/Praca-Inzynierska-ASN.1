@@ -1,60 +1,76 @@
 import pygame
+import asn1tools
 import numpy as np
 from network import Network
-from constants import BG_COLOR, LINE_COLOR, AVAILABLE_COLOR, UNAVAILABLE_COLOR, LINE_WIDTH, FONT, LETTERS,\
+from constants import BG_COLOR, LINE_COLOR, AVAILABLE_COLOR, UNAVAILABLE_COLOR, LINE_WIDTH, FONT, LETTERS, \
     NUMBERS, BOARD_ROWS, BOARD_COLS, BOX_SIZE, SHIP4SIDE, SHIP3SIDE, SHIP2SIDE, SHIP1SIDE, MISS_COLOR
 from ship import Ship
 
 
 class Board:
-    def __init__(self):
+    def __init__(self, WIN):
         self.board = np.zeros((10, 10))
         self.enemy_board = np.zeros((10, 10))
         self.your_ships_left = 20
         self.enemy_ships_left = 20
         self.ship_to_draw = []
-        self.n = Network()
+        self.network = Network()
         self.opponent_target = (11, 11)
+        self.asn = asn1tools.compile_files("asn1/modules.asn")
+        self.WIN = WIN
+        self.myNumber = self.network.get_pos()
 
-    @staticmethod
-    def draw_board(win):
-        win.fill(BG_COLOR)
+    def getNetwork(self):
+        return self.network
+
+    def draw_board(self):
+        self.WIN.fill(BG_COLOR)
         for i in range(12):
-            pygame.draw.line(win, LINE_COLOR, (50 + 50 * i, 50), (50 + 50 * i, 600), LINE_WIDTH)
-            pygame.draw.line(win, LINE_COLOR, (700 + 50 * i, 50), (700 + 50 * i, 600), LINE_WIDTH)
-            pygame.draw.line(win, LINE_COLOR, (50, 50 + 50 * i), (600, 50 + 50 * i), LINE_WIDTH)
-            pygame.draw.line(win, LINE_COLOR, (700, 50 + 50 * i), (1250, 50 + 50 * i), LINE_WIDTH)
+            # user Vertical Horizontal
+            pygame.draw.line(self.WIN, LINE_COLOR, (50 + 50 * i, 50), (50 + 50 * i, 600), LINE_WIDTH)
+            pygame.draw.line(self.WIN, LINE_COLOR, (50, 50 + 50 * i), (600, 50 + 50 * i), LINE_WIDTH)
 
-        pygame.draw.line(win, LINE_COLOR, (50, 50), (100, 100), LINE_WIDTH)
-        pygame.draw.line(win, LINE_COLOR, (700, 50), (750, 100), LINE_WIDTH)
+            # opponent Vertical Horizontal
+            pygame.draw.line(self.WIN, LINE_COLOR, (700 + 50 * i, 50), (700 + 50 * i, 600), LINE_WIDTH)
+            pygame.draw.line(self.WIN, LINE_COLOR, (700, 50 + 50 * i), (1250, 50 + 50 * i), LINE_WIDTH)
+
+        pygame.draw.line(self.WIN, LINE_COLOR, (50, 50), (100, 100), LINE_WIDTH)
+        pygame.draw.line(self.WIN, LINE_COLOR, (700, 50), (750, 100), LINE_WIDTH)
 
         for i in range(10):
-            win.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((110 + 50 * i), 60))
-            win.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((760 + 50 * i), 60))
-            win.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (60, (110 + 50 * i)))
-            win.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (710, (110 + 50 * i)))
+            self.WIN.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((110 + 50 * i), 60))
+            self.WIN.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((760 + 50 * i), 60))
+            self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (60, (110 + 50 * i)))
+            self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (710, (110 + 50 * i)))
 
-    def show_possible(self, win):
+    def show_possible(self):
         for row in range(BOARD_ROWS):
             for col in range(BOARD_COLS):
                 if self.board[row][col] == 0:
-                    pygame.draw.rect(win, AVAILABLE_COLOR,
+                    pygame.draw.rect(self.WIN, AVAILABLE_COLOR,
                                      pygame.Rect(105 + 50 * row, 105 + 50 * col, BOX_SIZE, BOX_SIZE))
                 elif self.board[row][col] == 2:
-                    pygame.draw.rect(win, UNAVAILABLE_COLOR,
+                    pygame.draw.rect(self.WIN, UNAVAILABLE_COLOR,
                                      pygame.Rect(105 + 50 * row, 105 + 50 * col, BOX_SIZE, BOX_SIZE))
 
-    def show_hit(self, win):
+    def show_hit(self):
         for row in range(BOARD_ROWS):
             for col in range(BOARD_COLS):
                 if self.board[row][col] == 3:
-                    win.blit(FONT.render(LETTERS[10], False, UNAVAILABLE_COLOR), ((110 + 50 * row), (110 + 50 * col)))
+                    self.WIN.blit(FONT.render(LETTERS[10], False, UNAVAILABLE_COLOR),
+                                  ((110 + 50 * row), (110 + 50 * col)))
                 elif self.board[row][col] == 4:
-                    win.blit(FONT.render(LETTERS[11], False, MISS_COLOR), ((110 + 50 * row), (110 + 50 * col)))
+                    self.WIN.blit(FONT.render(LETTERS[11], False, MISS_COLOR), ((110 + 50 * row), (110 + 50 * col)))
 
-    def draw_ships(self, win):
+                if self.enemy_board[row][col] == 3:
+                    self.WIN.blit(FONT.render(LETTERS[10], False, UNAVAILABLE_COLOR),
+                                  ((760 + 50 * row), (110 + 50 * col)))
+                elif self.enemy_board[row][col] == 4:
+                    self.WIN.blit(FONT.render(LETTERS[11], False, MISS_COLOR), ((760 + 50 * row), (110 + 50 * col)))
+
+    def draw_ships(self):
         for i in range(len(self.ship_to_draw)):
-            self.ship_to_draw[i].draw(win)
+            self.ship_to_draw[i].draw(self.WIN)
 
     @staticmethod
     def ship_len(chosen_ship):
@@ -118,18 +134,30 @@ class Board:
                 if (750 + 50 * row) < mx < (800 + 50 * row) and (100 + 50 * col) < my < (150 + 50 * col):
                     if self.enemy_board[row][col] == 0:
                         self.enemy_board[row][col] = 1
-                        self.n.send(make_pos((row, col)))
-                        enemy_target = read_pos(self.n.send(make_pos((row, col))))
+                        print(
+                            f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} \n len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}")
+                        enemy_target = self.network.send(self.asn.encode('Request', {'column': col, 'row': row}))
+
+                        enemy_target = self.asn.decode('Response', enemy_target)
+
+                        self.enemyCheckHit(enemy_target)
+
                         self.wait_for_opponent(enemy_target)
 
+    def enemyCheckHit(self, enemyTarget):
+        if enemyTarget['hit']:
+            self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 3
+        else:
+            self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 4
+
     def wait_for_opponent(self, enemy_target):
-        print(enemy_target)
+        print(f"enemy target: {enemy_target}")
         if enemy_target is not None:
-            if self.board[enemy_target[0]][enemy_target[1]] == 1:
-                self.board[enemy_target[0]][enemy_target[1]] = 3
+            if self.board[enemy_target['row']][enemy_target['column']] == 1:
+                self.board[enemy_target['row']][enemy_target['column']] = 3
                 self.your_ships_left -= 1
             else:
-                self.board[enemy_target[0]][enemy_target[1]] = 4
+                self.board[enemy_target['row']][enemy_target['column']] = 4
 
     def end_game(self):
         pass

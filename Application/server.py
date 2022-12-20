@@ -1,15 +1,22 @@
 import socket
 from _thread import *
 import random
-import sys
+import asn1tools
 
 server = "127.0.0.1"
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+asn = asn1tools.compile_files("asn1/modules.asn")
+
 port = 5555
+
+connections = []
+oneEndedConnection = False
+playerTurn = 0
 
 try:
     s.bind((server, port))
+    print(f"Server Lan IP: {socket.gethostbyname(socket.gethostname())}")
 except socket.error as e:
     str(e)
 
@@ -17,50 +24,46 @@ s.listen(2)
 print("Waiting for connection, Server Started")
 
 
-def read_pos(str):
-    str = str.split(",")
-    return int(str[0]), int(str[1])
+def threaded_client(conn):
+    print(f"sended welcome data to {conn.getpeername()}")
+    conn.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn), 'connected': True}))
 
-
-def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1])
-
-
-pos = [(0, 0), (0, 0)]
-
-
-def threaded_client(conn, currentPlayer):
-    conn.send(str.encode("Connected"))
-    reply = ""
     while True:
         try:
-            data = read_pos(conn.recv(2048).decode())
-            pos[currentPlayer] = data
+            data = conn.recv(2048)
+
+            print(f"Receive from Turn Player\n\n")
             print(data)
+            print(asn.decode('Request', data))
+            # print(asn.decode('Request', data))
+            asn1Receivd = dict(asn.decode('Request', data))
 
-            if not data:
-                print("Disconnected")
-                break
-            else:
-                reply = (random.randint(0, 9), random.randint(0, 9))
-                print(reply)
-                # if player == 1:
-                #     reply = pos[0]
-                # else:
-                #     reply = pos[1]
-                print("Received: ", data)
-                print("Sending : ", reply)
+            # connections[not playerTurn].sendall(data)
+            #
+            # print(f"Receive from Second Player\n\n")
+            # data = connections[not playerTurn].recv(2048)
+            # print(data)
+            # print(asn.decode('Response', data))
+            # # print(asn.decode('Request', data))
+            # asn1Receivd = dict(asn.decode('Request', data))
+            # print(asn1Receivd)
+            # connections[playerTurn].sendall(data)
+            conn.sendall(
+                asn.encode('Response', {'hit': True, 'column': asn1Receivd['column'], 'row': asn1Receivd['row']}))
 
-            conn.sendall(str.encode(make_pos(reply)))
-        except:
+        except Exception as inst:
+            print(inst)
+            print(inst.args)
             break
     print("Lost connection")
+    connections.remove(conn)
+    conn.shutdown(socket.SHUT_RDWR)
     conn.close()
 
 
-currentPlayer = 0
 while True:
     conn, addr = s.accept()
+    connections.append(conn)
+    print(connections)
     print("Connected to:", addr)
-    start_new_thread(threaded_client, (conn, currentPlayer))
-    currentPlayer += 1
+    start_new_thread(threaded_client, (conn,))

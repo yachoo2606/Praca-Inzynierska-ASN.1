@@ -3,7 +3,7 @@ import pygame_menu
 from constants import WIDTH, HEIGHT, FONT, LINE_COLOR, SHIP4SIDE, SHIP3SIDE, SHIP2SIDE, SHIP1SIDE
 from board import Board
 from pygame import mixer
-from network import Network
+from _thread import *
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 FPS = 120
@@ -72,16 +72,17 @@ def game():
     chosen_ship = None
     rotate = False
     game_phase = False
-    board = Board()
+    board = Board(WIN)
+    turn = board.myNumber
 
     while run:
         clock.tick(FPS)
-        board.draw_board(WIN)
+        board.draw_board()
         mx, my = pygame.mouse.get_pos()
         if game_phase is False:
             draw_setup(WIN)
         if chosen_ship is not None:
-            board.show_possible(WIN)
+            board.show_possible()
             if rotate is False:
                 WIN.blit(chosen_ship, (mx - 20, my - 20))
             else:
@@ -102,8 +103,8 @@ def game():
                     if 750 < mx < 1250 and 100 < my < 600:
                         board.shoot_the_enemy(mx, my)
 
-        board.draw_ships(WIN)
-        board.show_hit(WIN)
+        board.draw_ships()
+        board.show_hit()
         board.end_game()
         pygame.display.update()
     pygame.quit()

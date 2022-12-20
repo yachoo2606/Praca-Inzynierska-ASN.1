@@ -1,0 +1,20 @@
+Requests DEFINITIONS ::= BEGIN
+
+    Connected ::= SEQUENCE{
+        message     IA5String,
+        number      INTEGER,
+        connected   BOOLEAN
+    }
+
+    Request ::= SEQUENCE{
+        column     INTEGER,
+        row        INTEGER
+    }
+
+    Response ::= SEQUENCE{
+        column     INTEGER,
+        row        INTEGER,
+        hit        BOOLEAN
+    }
+
+END
