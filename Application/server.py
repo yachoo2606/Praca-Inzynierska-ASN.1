@@ -24,46 +24,58 @@ s.listen(2)
 print("Waiting for connection, Server Started")
 
 
-def threaded_client(conn):
-    print(f"sended welcome data to {conn.getpeername()}")
-    conn.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn), 'connected': True}))
+def threaded_client(conn1,conn2):
+    print(f"sended welcome data to {conn1.getpeername()}")
+    conn1.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn1), 'connected': True}))
+    print(f"sended welcome data to {conn2.getpeername()}")
+    conn2.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn2), 'connected': True}))
+
+    global playerTurn
 
     while True:
         try:
-            data = conn.recv(2048)
+            data = connections[playerTurn].recv(2048)
 
             print(f"Receive from Turn Player\n\n")
             print(data)
             print(asn.decode('Request', data))
-            # print(asn.decode('Request', data))
             asn1Receivd = dict(asn.decode('Request', data))
 
-            # connections[not playerTurn].sendall(data)
-            #
-            # print(f"Receive from Second Player\n\n")
-            # data = connections[not playerTurn].recv(2048)
-            # print(data)
-            # print(asn.decode('Response', data))
-            # # print(asn.decode('Request', data))
-            # asn1Receivd = dict(asn.decode('Request', data))
-            # print(asn1Receivd)
-            # connections[playerTurn].sendall(data)
-            conn.sendall(
-                asn.encode('Response', {'hit': True, 'column': asn1Receivd['column'], 'row': asn1Receivd['row']}))
+            connections[not playerTurn].sendall(data)
+
+            print(f"Receive from Second Player\n\n")
+            data = connections[not playerTurn].recv(2048)
+            print(data)
+            print(asn.decode('Response', data))
+            # print(asn.decode('Request', data))
+            asn1Receivd = dict(asn.decode('Request', data))
+            print(asn1Receivd)
+            connections[playerTurn].sendall(data)
+            # connections[playerTurn].sendall(
+            #     asn.encode('Response', {'hit': True, 'column': asn1Receivd['column'], 'row': asn1Receivd['row']}))
+            playerTurn = not playerTurn
+
 
         except Exception as inst:
             print(inst)
             print(inst.args)
             break
     print("Lost connection")
-    connections.remove(conn)
-    conn.shutdown(socket.SHUT_RDWR)
-    conn.close()
+    connections.remove(conn1)
+    connections.remove(conn2)
+    conn1.shutdown(socket.SHUT_RDWR)
+    conn2.shutdown(socket.SHUT_RDWR)
+    conn1.close()
+    conn2.close()
 
 
 while True:
-    conn, addr = s.accept()
-    connections.append(conn)
+    conn1, addr1 = s.accept()
+    connections.append(conn1)
     print(connections)
-    print("Connected to:", addr)
-    start_new_thread(threaded_client, (conn,))
+    conn2, addr2 = s.accept()
+    connections.append(conn2)
+    print(connections)
+    print("Connected to:", addr1, addr2)
+
+    start_new_thread(threaded_client, (conn1,conn2))

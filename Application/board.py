@@ -135,14 +135,16 @@ class Board:
                     if self.enemy_board[row][col] == 0:
                         self.enemy_board[row][col] = 1
                         print(
-                            f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} \n len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}")
-                        enemy_target = self.network.send(self.asn.encode('Request', {'column': col, 'row': row}))
+                            f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}")
+                        enemy_board_Data = self.network.send(self.asn.encode('Request', {'column': col, 'row': row}))
 
-                        enemy_target = self.asn.decode('Response', enemy_target)
+                        self.myNumber = not self.myNumber
 
-                        self.enemyCheckHit(enemy_target)
+                        enemy_board_Data = self.asn.decode('Response', enemy_board_Data)
 
-                        self.wait_for_opponent(enemy_target)
+                        self.enemyCheckHit(enemy_board_Data)
+
+                        self.wait_for_opponent(enemy_board_Data)
 
     def enemyCheckHit(self, enemyTarget):
         if enemyTarget['hit']:
@@ -161,6 +163,28 @@ class Board:
 
     def end_game(self):
         pass
+
+    def check_Enemys_Target(self):
+        while True:
+            if self.myNumber == 1:
+                print("Data recived from second player: ")
+                data = self.network.client.recv(2048)
+                print(data)
+                reqested_Data = dict(self.asn.decode("Request",data))
+                print(f"requested data : {reqested_Data}")
+                print()
+                if self.board[reqested_Data['row']][reqested_Data['column']]==3:
+                    self.network.client.send(
+                        self.asn.encode('Response', {'hit': True, 'column': reqested_Data['column'], 'row': reqested_Data['row']})
+                    )
+                else:
+                    self.network.client.send(
+                        self.asn.encode('Response',
+                                        {'hit': False, 'column': reqested_Data['column'], 'row': reqested_Data['row']})
+                    )
+
+                self.myNumber = 0
+
 
 
 def read_pos(str):

@@ -73,9 +73,13 @@ def game():
     rotate = False
     game_phase = False
     board = Board(WIN)
-    turn = board.myNumber
+
+    start_new_thread(board.check_Enemys_Target, ())
 
     while run:
+
+        turn = board.myNumber
+
         clock.tick(FPS)
         board.draw_board()
         mx, my = pygame.mouse.get_pos()
@@ -99,9 +103,10 @@ def game():
                     if event.button == 3:
                         rotate = not rotate
             else:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if 750 < mx < 1250 and 100 < my < 600:
-                        board.shoot_the_enemy(mx, my)
+                if turn == 0:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if 750 < mx < 1250 and 100 < my < 600:
+                            board.shoot_the_enemy(mx, my)
 
         board.draw_ships()
         board.show_hit()
