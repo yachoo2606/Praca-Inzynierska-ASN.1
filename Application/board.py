@@ -7,6 +7,7 @@ from network import Network
 from constants import BG_COLOR, LINE_COLOR, AVAILABLE_COLOR, UNAVAILABLE_COLOR, LINE_WIDTH, FONT, LETTERS, \
     NUMBERS, BOARD_ROWS, BOARD_COLS, BOX_SIZE, SHIP4SIDE, SHIP3SIDE, SHIP2SIDE, SHIP1SIDE, MISS_COLOR
 from ship import Ship
+from pygame import mixer
 
 
 class Board:
@@ -146,7 +147,6 @@ class Board:
 
                         self.enemyCheckHit(enemy_board_Data)
 
-
     def enemyCheckHit(self, enemyTarget):
         if enemyTarget['hit']:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 3
@@ -158,12 +158,15 @@ class Board:
         pass
 
     def check_Enemy_Target(self):
+        mixer.init()
+        hitSound = mixer.Sound("music/explosion_F_minor.wav")
+        missSound = mixer.Sound("music/splashing-water-fx.wav")
         while True:
             if self.myNumber == 1:
                 print("Data received from second player: ")
                 data = self.network.client.recv(2048)
                 print(data)
-                requested_Data = dict(self.asn.decode("Request",data))
+                requested_Data = dict(self.asn.decode("Request", data))
                 print(f"requested data : {requested_Data}")
                 print()
                 if self.board[requested_Data['row']][requested_Data['column']] == 1:
@@ -171,24 +174,15 @@ class Board:
                         self.asn.encode('Response',
                                         {'hit': True, 'column': requested_Data['column'], 'row': requested_Data['row']})
                     )
+                    hitSound.play()
                     self.board[requested_Data['row']][requested_Data['column']] = 3
                     self.your_ships_left -= 1
                 else:
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': False, 'column': requested_Data['column'], 'row': requested_Data['row']})
+                                        {'hit': False, 'column': requested_Data['column'],
+                                         'row': requested_Data['row']})
                     )
                     self.board[requested_Data['row']][requested_Data['column']] = 4
-
+                    missSound.play()
                 self.myNumber = 0
-
-
-
-def read_pos(str):
-    if str is not None:
-        str = str.split(",")
-        return int(str[0]), int(str[1])
-
-
-def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1])
