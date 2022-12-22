@@ -14,7 +14,6 @@ num_ships = [4, 3, 2, 1]
 
 asn = asn1tools.compile_files("asn1/modules.asn")
 
-
 mixer.init()
 backSound = mixer.Sound("music/pirate-music-14288.mp3")
 backSound.play(loops=-1)
@@ -23,6 +22,7 @@ pressSound = mixer.Sound("music/pressSound2.ogg")
 mode = ('Solo', 0)
 waiting = True
 not_end_game = True
+
 
 def draw_setup(win):
     win.blit(FONT.render("Ustaw swoje statki", False, LINE_COLOR), (110, 610))
@@ -81,6 +81,7 @@ def waitingForReady(board):
 
 
 def game():
+    global not_end_game
     run = True
     clock = pygame.time.Clock()
     chosen_ship = None
@@ -115,23 +116,23 @@ def game():
                         chosen_ship = set_ships(mx, my, chosen_ship, board, rotate)
                         if (num_ships[0] + num_ships[1] + num_ships[2] + num_ships[3]) == 0 and chosen_ship is None:
                             game_phase = not game_phase
-                            board.network.client.send(board.asn.encode('Ready', {'ready': True}))
+                            board.network.client.send(asn.encode('Ready', {'ready': True}))
 
                     if event.button == 3:
                         rotate = not rotate
             else:
-                if waiting == False:
+                if not waiting:
                     if turn == 0 and not_end_game:
                         if event.type == pygame.MOUSEBUTTONDOWN:
                             if 750 < mx < 1250 and 100 < my < 600:
                                 board.shoot_the_enemy(mx, my)
                     if board.your_ships_left == 0:
                         WIN.blit(FONT.render("You LOST", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
-                        end_game = False
+                        not_end_game = False
                     if board.enemy_ships_left == 0:
                         WIN.blit(FONT.render("You WON", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
                         turn = 1
-                        end_game = False
+                        not_end_game = False
 
         board.draw_ships()
         board.show_hit()
