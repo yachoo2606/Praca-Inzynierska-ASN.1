@@ -1,3 +1,5 @@
+import pprint
+
 import pygame
 import asn1tools
 import numpy as np
@@ -144,44 +146,39 @@ class Board:
 
                         self.enemyCheckHit(enemy_board_Data)
 
-                        self.wait_for_opponent(enemy_board_Data)
 
     def enemyCheckHit(self, enemyTarget):
         if enemyTarget['hit']:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 3
+            self.enemy_ships_left -= 1
         else:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 4
-
-    def wait_for_opponent(self, enemy_target):
-        print(f"enemy target: {enemy_target}")
-        if enemy_target is not None:
-            if self.board[enemy_target['row']][enemy_target['column']] == 1:
-                self.board[enemy_target['row']][enemy_target['column']] = 3
-                self.your_ships_left -= 1
-            else:
-                self.board[enemy_target['row']][enemy_target['column']] = 4
 
     def end_game(self):
         pass
 
-    def check_Enemys_Target(self):
+    def check_Enemy_Target(self):
         while True:
             if self.myNumber == 1:
-                print("Data recived from second player: ")
+                print("Data received from second player: ")
                 data = self.network.client.recv(2048)
                 print(data)
-                reqested_Data = dict(self.asn.decode("Request",data))
-                print(f"requested data : {reqested_Data}")
+                requested_Data = dict(self.asn.decode("Request",data))
+                print(f"requested data : {requested_Data}")
                 print()
-                if self.board[reqested_Data['row']][reqested_Data['column']]==3:
+                if self.board[requested_Data['row']][requested_Data['column']] == 1:
                     self.network.client.send(
-                        self.asn.encode('Response', {'hit': True, 'column': reqested_Data['column'], 'row': reqested_Data['row']})
+                        self.asn.encode('Response',
+                                        {'hit': True, 'column': requested_Data['column'], 'row': requested_Data['row']})
                     )
+                    self.board[requested_Data['row']][requested_Data['column']] = 3
+                    self.your_ships_left -= 1
                 else:
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': False, 'column': reqested_Data['column'], 'row': reqested_Data['row']})
+                                        {'hit': False, 'column': requested_Data['column'], 'row': requested_Data['row']})
                     )
+                    self.board[requested_Data['row']][requested_Data['column']] = 4
 
                 self.myNumber = 0
 

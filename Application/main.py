@@ -74,7 +74,9 @@ def game():
     game_phase = False
     board = Board(WIN)
 
-    start_new_thread(board.check_Enemys_Target, ())
+    start_new_thread(board.check_Enemy_Target, ())
+
+    end_game = True
 
     while run:
 
@@ -103,10 +105,17 @@ def game():
                     if event.button == 3:
                         rotate = not rotate
             else:
-                if turn == 0:
+                if turn == 0 and end_game:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if 750 < mx < 1250 and 100 < my < 600:
                             board.shoot_the_enemy(mx, my)
+                if board.your_ships_left == 0:
+                    WIN.blit(FONT.render("You LOST", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
+                    end_game = False
+                if board.enemy_ships_left == 0:
+                    WIN.blit(FONT.render("You WON", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
+                    turn = 1
+                    end_game = False
 
         board.draw_ships()
         board.show_hit()
