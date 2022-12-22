@@ -1,4 +1,5 @@
 import pygame
+
 pygame.init()
 
 WIDTH = 1300
@@ -15,7 +16,8 @@ UNAVAILABLE_COLOR = (255, 0, 0)
 MISS_COLOR = (0, 0, 0)
 # letters
 LETTERS = "ABCDEFGHIJXO"
-NUMBERS = "0123456789"
+NUMBERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+# NUMBERS = "0123456789"
 FONT = pygame.font.SysFont('comicssans', 60)
 
 # assets

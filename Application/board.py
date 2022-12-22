@@ -43,8 +43,13 @@ class Board:
         for i in range(10):
             self.WIN.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((110 + 50 * i), 60))
             self.WIN.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((760 + 50 * i), 60))
-            self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (60, (110 + 50 * i)))
-            self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (710, (110 + 50 * i)))
+            if NUMBERS[i] == "10":
+                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (52, (110 + 50 * i)))
+                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (702, (110 + 50 * i)))
+            else:
+                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (60, (110 + 50 * i)))
+                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (710, (110 + 50 * i)))
+
 
     def show_possible(self):
         for row in range(BOARD_ROWS):
