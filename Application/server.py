@@ -1,6 +1,5 @@
 import socket
 from _thread import *
-import random
 import asn1tools
 
 server = "127.0.0.1"
