@@ -21,10 +21,10 @@ s.listen(2)
 print("Waiting for connection, Server Started")
 
 
-def threaded_client(conn1,conn2):
-    print(f"sended welcome data to {conn1.getpeername()}")
+def threaded_client(conn1, conn2):
+    print(f"Sent welcome data to {conn1.getpeername()}")
     conn1.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn1), 'connected': True}))
-    print(f"sended welcome data to {conn2.getpeername()}")
+    print(f"Sent welcome data to {conn2.getpeername()}")
     conn2.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn2), 'connected': True}))
 
     playerTurn = 0
@@ -68,11 +68,11 @@ def threaded_client(conn1,conn2):
             #     asn.encode('Response', {'hit': True, 'column': asn1Receivd['column'], 'row': asn1Receivd['row']}))
             playerTurn = not playerTurn
 
-
         except Exception as inst:
             print(inst)
             print(inst.args)
             break
+
     print("Lost connection")
     connections.remove(conn1)
     connections.remove(conn2)
@@ -82,13 +82,18 @@ def threaded_client(conn1,conn2):
     conn2.close()
 
 
-while True:
-    conn1, addr1 = s.accept()
-    connections.append(conn1)
-    print(connections)
-    conn2, addr2 = s.accept()
-    connections.append(conn2)
-    print(connections)
-    print("Connected to:", addr1, addr2)
+def main():
+    while True:
+        conn1, addr1 = s.accept()
+        connections.append(conn1)
+        print(connections)
+        conn2, addr2 = s.accept()
+        connections.append(conn2)
+        print(connections)
+        print("Connected to:", addr1, addr2)
 
-    start_new_thread(threaded_client, (conn1,conn2))
+        start_new_thread(threaded_client, (conn1, conn2))
+
+
+if __name__ == '__main__':
+    main()
