@@ -4,6 +4,7 @@ from constants import WIDTH, HEIGHT, FONT, LINE_COLOR, SHIP4SIDE, SHIP3SIDE, SHI
 from board import Board
 from pygame import mixer
 from _thread import *
+import asn1tools
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 FPS = 120
@@ -11,13 +12,17 @@ FPS = 120
 pygame.display.set_caption("Battleship")
 num_ships = [4, 3, 2, 1]
 
+asn = asn1tools.compile_files("asn1/modules.asn")
+
+
 mixer.init()
 backSound = mixer.Sound("music/pirate-music-14288.mp3")
 backSound.play(loops=-1)
 pressSound = mixer.Sound("music/pressSound2.ogg")
 
 mode = ('Solo', 0)
-
+waiting = True
+not_end_game = True
 
 def draw_setup(win):
     win.blit(FONT.render("Ustaw swoje statki", False, LINE_COLOR), (110, 610))
@@ -66,6 +71,15 @@ def set_ships(mx, my, chosen_ship, board, rotate):
         return chosen_ship
 
 
+def waitingForReady(board):
+    global waiting, not_end_game
+    while waiting:
+        if waiting:
+            if dict(asn.decode('Ready', board.network.client.recv(2048)))['ready']:
+                waiting = False
+    not_end_game = True
+
+
 def game():
     run = True
     clock = pygame.time.Clock()
@@ -74,9 +88,8 @@ def game():
     game_phase = False
     board = Board(WIN)
 
+    start_new_thread(waitingForReady, (board,))
     start_new_thread(board.check_Enemy_Target, ())
-
-    end_game = True
 
     while run:
 
@@ -102,20 +115,23 @@ def game():
                         chosen_ship = set_ships(mx, my, chosen_ship, board, rotate)
                         if (num_ships[0] + num_ships[1] + num_ships[2] + num_ships[3]) == 0 and chosen_ship is None:
                             game_phase = not game_phase
+                            board.network.client.send(board.asn.encode('Ready', {'ready': True}))
+
                     if event.button == 3:
                         rotate = not rotate
             else:
-                if turn == 0 and end_game:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if 750 < mx < 1250 and 100 < my < 600:
-                            board.shoot_the_enemy(mx, my)
-                if board.your_ships_left == 0:
-                    WIN.blit(FONT.render("You LOST", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
-                    end_game = False
-                if board.enemy_ships_left == 0:
-                    WIN.blit(FONT.render("You WON", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
-                    turn = 1
-                    end_game = False
+                if waiting == False:
+                    if turn == 0 and not_end_game:
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if 750 < mx < 1250 and 100 < my < 600:
+                                board.shoot_the_enemy(mx, my)
+                    if board.your_ships_left == 0:
+                        WIN.blit(FONT.render("You LOST", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
+                        end_game = False
+                    if board.enemy_ships_left == 0:
+                        WIN.blit(FONT.render("You WON", True, LINE_COLOR), (HEIGHT / 2, WIDTH / 2))
+                        turn = 1
+                        end_game = False
 
         board.draw_ships()
         board.show_hit()

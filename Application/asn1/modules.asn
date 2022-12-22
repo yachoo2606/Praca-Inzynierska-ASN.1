@@ -17,4 +17,8 @@ Requests DEFINITIONS ::= BEGIN
         hit        BOOLEAN
     }
 
+    Ready ::= SEQUENCE{
+        ready      BOOLEAN
+    }
+
 END

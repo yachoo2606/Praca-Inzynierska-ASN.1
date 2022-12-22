@@ -10,8 +10,6 @@ asn = asn1tools.compile_files("asn1/modules.asn")
 port = 5555
 
 connections = []
-oneEndedConnection = False
-playerTurn = 0
 
 try:
     s.bind((server, port))
@@ -29,7 +27,24 @@ def threaded_client(conn1,conn2):
     print(f"sended welcome data to {conn2.getpeername()}")
     conn2.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn2), 'connected': True}))
 
-    global playerTurn
+    playerTurn = 0
+    player1Ready = False
+    player2Ready = False
+
+    while not player1Ready and not player2Ready:
+        if not player1Ready:
+            readyPlayer1Data = conn1.recv(2048)
+            if dict(asn.decode('Ready', readyPlayer1Data))['ready']:
+                player1Ready = True
+
+        if not player2Ready:
+            readyPlayer2Data = conn2.recv(2048)
+            if dict(asn.decode('Ready', readyPlayer2Data))['ready']:
+                player2Ready = True
+        print(f"player1 = {bool(player1Ready)} player2 = {bool(player2Ready)}")
+
+    conn1.send(asn.encode('Ready', {'ready': True}))
+    conn2.send(asn.encode('Ready', {'ready': True}))
 
     while True:
         try:
@@ -38,7 +53,6 @@ def threaded_client(conn1,conn2):
             print(f"Receive from Turn Player\n\n")
             print(data)
             print(asn.decode('Request', data))
-            asn1Receivd = dict(asn.decode('Request', data))
 
             connections[not playerTurn].sendall(data)
 
