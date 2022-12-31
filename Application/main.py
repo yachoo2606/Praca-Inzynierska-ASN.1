@@ -8,7 +8,7 @@ import asn1tools
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 FPS = 120
-
+ADDRESS = pygame_menu.widgets.TextInput("temp")
 pygame.display.set_caption("Battleship")
 num_ships = [4, 3, 2, 1]
 
@@ -81,13 +81,13 @@ def waitingForReady(board):
 
 
 def game():
-    global not_end_game
+    global not_end_game, ADDRESS
     run = True
     clock = pygame.time.Clock()
     chosen_ship = None
     rotate = False
     game_phase = False
-    board = Board(WIN)
+    board = Board(WIN, ADDRESS.get_value())
 
     start_new_thread(waitingForReady, (board,))
     start_new_thread(board.check_Enemy_Target, ())
@@ -153,8 +153,10 @@ def playPressSound(val):
 
 
 def main():
+    global ADDRESS
+
     menu = pygame_menu.Menu('Welcome', WIDTH, HEIGHT, theme=pygame_menu.themes.THEME_BLUE)
-    menu.add.text_input("Name: ", default="User name", onchange=playPressSound)
+    ADDRESS = menu.add.text_input("Address: ", default="127.0.0.1", onchange=playPressSound)
     menu.add.selector('Mode: ', [('Solo', 0), ('Multiplayer', 1)], onchange=setMode)
     menu.add.button("Play", game)
     menu.add.button("Quit", pygame_menu.events.EXIT)

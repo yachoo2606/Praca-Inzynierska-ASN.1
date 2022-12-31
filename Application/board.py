@@ -11,13 +11,13 @@ from pygame import mixer
 
 
 class Board:
-    def __init__(self, WIN):
+    def __init__(self, WIN, ADDRESS):
         self.board = np.zeros((10, 10))
         self.enemy_board = np.zeros((10, 10))
         self.your_ships_left = 20
         self.enemy_ships_left = 20
         self.ship_to_draw = []
-        self.network = Network()
+        self.network = Network(ADDRESS)
         self.opponent_target = (11, 11)
         self.asn = asn1tools.compile_files("asn1/modules.asn")
         self.WIN = WIN
@@ -49,7 +49,6 @@ class Board:
             else:
                 self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (60, (110 + 50 * i)))
                 self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (710, (110 + 50 * i)))
-
 
     def show_possible(self):
         for row in range(BOARD_ROWS):
