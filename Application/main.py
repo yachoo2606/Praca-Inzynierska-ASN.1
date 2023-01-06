@@ -115,13 +115,6 @@ def game():
                 WIN.blit(chosen_ship, (mx - 20, my - 20))
             else:
                 WIN.blit(pygame.transform.rotate(chosen_ship, -90), (mx - 20, my - 20))
-        if board.your_ships_left == 0:
-            display_end_board(WIN, UNAVAILABLE_COLOR, "YOU LOST")
-            not_end_game = False
-        if board.enemy_ships_left == 0:
-            display_end_board(WIN, AVAILABLE_COLOR, "YOU WIN")
-            turn = 1
-            not_end_game = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -149,6 +142,12 @@ def game():
         board.draw_ships()
         board.show_hit()
         board.end_game()
+        if board.your_ships_left == 0:
+            display_end_board(WIN, UNAVAILABLE_COLOR, "YOU LOST")
+            not_end_game = False
+        if board.enemy_ships_left == 0:
+            display_end_board(WIN, AVAILABLE_COLOR, "YOU WIN")
+            not_end_game = False
         pygame.display.update()
     pygame.quit()
 
