@@ -16,10 +16,10 @@ num_ships = [4, 3, 2, 1]
 
 asn = asn1tools.compile_files("asn1/modules.asn")
 
-# mixer.init()
-# backSound = mixer.Sound("music/pirate-music-14288.mp3")
-# backSound.play(loops=-1)
-# pressSound = mixer.Sound("music/pressSound2.ogg")
+mixer.init()
+backSound = mixer.Sound("music/pirate-music-14288.mp3")
+backSound.play(loops=-1)
+pressSound = mixer.Sound("music/pressSound2.ogg")
 
 mode = ('Solo', 0)
 waiting = True
@@ -155,14 +155,14 @@ def game():
 
 def set_mode(val, test):
     global mode
-    # pressSound.play()
+    pressSound.play()
     print(val[0], test)
     mode = val[0]
 
 
 def play_press_sound():
-    # pressSound.play()
-    pass
+    pressSound.play()
+    # pass
 
 
 def main():
