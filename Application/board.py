@@ -11,7 +11,7 @@ from pygame import mixer
 
 
 class Board:
-    def __init__(self, WIN, ADDRESS):
+    def __init__(self, WIN, ADDRESS, log_box):
         self.board = np.zeros((10, 10))
         self.enemy_board = np.zeros((10, 10))
         self.your_ships_left = 20
@@ -22,12 +22,14 @@ class Board:
         self.asn = asn1tools.compile_files("asn1/modules.asn")
         self.WIN = WIN
         self.myNumber = self.network.get_pos()
+        self.log_box = log_box
 
     def getNetwork(self):
         return self.network
 
     def draw_board(self):
         self.WIN.fill(BG_COLOR)
+        self.log_box.draw_box()
         for i in range(12):
             # user Vertical Horizontal
             pygame.draw.line(self.WIN, LINE_COLOR, (50 + 50 * i, 50), (50 + 50 * i, 600), LINE_WIDTH)
@@ -41,14 +43,14 @@ class Board:
         pygame.draw.line(self.WIN, LINE_COLOR, (700, 50), (750, 100), LINE_WIDTH)
 
         for i in range(10):
-            self.WIN.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((110 + 50 * i), 60))
-            self.WIN.blit(FONT.render(LETTERS[i], False, LINE_COLOR), ((760 + 50 * i), 60))
+            self.WIN.blit(FONT.render(LETTERS[i], True, LINE_COLOR), ((110 + 50 * i), 60))
+            self.WIN.blit(FONT.render(LETTERS[i], True, LINE_COLOR), ((760 + 50 * i), 60))
             if NUMBERS[i] == "10":
-                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (52, (110 + 50 * i)))
-                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (702, (110 + 50 * i)))
+                self.WIN.blit(FONT.render(NUMBERS[i], True, LINE_COLOR), (52, (110 + 50 * i)))
+                self.WIN.blit(FONT.render(NUMBERS[i], True, LINE_COLOR), (702, (110 + 50 * i)))
             else:
-                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (60, (110 + 50 * i)))
-                self.WIN.blit(FONT.render(NUMBERS[i], False, LINE_COLOR), (710, (110 + 50 * i)))
+                self.WIN.blit(FONT.render(NUMBERS[i], True, LINE_COLOR), (60, (110 + 50 * i)))
+                self.WIN.blit(FONT.render(NUMBERS[i], True, LINE_COLOR), (710, (110 + 50 * i)))
 
     def show_possible(self):
         for row in range(BOARD_ROWS):
@@ -64,16 +66,16 @@ class Board:
         for row in range(BOARD_ROWS):
             for col in range(BOARD_COLS):
                 if self.board[row][col] == 3:
-                    self.WIN.blit(FONT.render(LETTERS[10], False, UNAVAILABLE_COLOR),
+                    self.WIN.blit(FONT.render(LETTERS[10], True, UNAVAILABLE_COLOR),
                                   ((110 + 50 * row), (110 + 50 * col)))
                 elif self.board[row][col] == 4:
-                    self.WIN.blit(FONT.render(LETTERS[11], False, MISS_COLOR), ((110 + 50 * row), (110 + 50 * col)))
+                    self.WIN.blit(FONT.render(LETTERS[11], True, MISS_COLOR), ((110 + 50 * row), (110 + 50 * col)))
 
                 if self.enemy_board[row][col] == 3:
-                    self.WIN.blit(FONT.render(LETTERS[10], False, UNAVAILABLE_COLOR),
+                    self.WIN.blit(FONT.render(LETTERS[10], True, UNAVAILABLE_COLOR),
                                   ((760 + 50 * row), (110 + 50 * col)))
                 elif self.enemy_board[row][col] == 4:
-                    self.WIN.blit(FONT.render(LETTERS[11], False, MISS_COLOR), ((760 + 50 * row), (110 + 50 * col)))
+                    self.WIN.blit(FONT.render(LETTERS[11], True, MISS_COLOR), ((760 + 50 * row), (110 + 50 * col)))
 
     def draw_ships(self):
         for i in range(len(self.ship_to_draw)):
@@ -141,8 +143,9 @@ class Board:
                 if (750 + 50 * row) < mx < (800 + 50 * row) and (100 + 50 * col) < my < (150 + 50 * col):
                     if self.enemy_board[row][col] == 0:
                         self.enemy_board[row][col] = 1
-                        print(
-                            f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}")
+                        encode_print = f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}"
+                        print(encode_print)
+                        self.log_box.log_to_draw.append(encode_print)
                         enemy_board_Data = self.network.send(self.asn.encode('Request', {'column': col, 'row': row}))
 
                         self.myNumber = not self.myNumber
@@ -173,6 +176,8 @@ class Board:
                 requested_Data = dict(self.asn.decode("Request", data))
                 print(f"requested data : {requested_Data}")
                 print()
+                self.log_box.log_to_draw.append("Data received from second player: " + str(data))
+                self.log_box.log_to_draw.append(f"requested data : {requested_Data}")
                 if self.board[requested_Data['row']][requested_Data['column']] == 1:
                     self.network.client.send(
                         self.asn.encode('Response',
@@ -190,3 +195,4 @@ class Board:
                     self.board[requested_Data['row']][requested_Data['column']] = 4
                     missSound.play()
                 self.myNumber = 0
+

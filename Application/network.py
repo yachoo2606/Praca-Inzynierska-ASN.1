@@ -4,7 +4,7 @@ import asn1tools
 
 
 class Network:
-    def __init__(self, ADDRESS="127.0.0.1"):
+    def __init__(self, ADDRESS = "127.0.0.1"):
         self.asn = asn1tools.compile_files('asn1/modules.asn')
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server = ADDRESS
