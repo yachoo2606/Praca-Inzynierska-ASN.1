@@ -21,7 +21,7 @@ s.listen(2)
 print("Waiting for connection, Server Started")
 
 
-def threaded_client(conn1, conn2):
+def threaded_game(conn1, conn2):
     print(f"Sent welcome data to {conn1.getpeername()}")
     conn1.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn1), 'connected': True}))
     print(f"Sent welcome data to {conn2.getpeername()}")
@@ -61,11 +61,10 @@ def threaded_client(conn1, conn2):
             print(data)
             print(asn.decode('Response', data))
             # print(asn.decode('Request', data))
-            asn1Receivd = dict(asn.decode('Request', data))
-            print(asn1Receivd)
+            asn1Received = dict(asn.decode('Request', data))
+            print(asn1Received)
             connections[playerTurn].sendall(data)
-            # connections[playerTurn].sendall(
-            #     asn.encode('Response', {'hit': True, 'column': asn1Receivd['column'], 'row': asn1Receivd['row']}))
+
             playerTurn = not playerTurn
 
         except Exception as inst:
@@ -92,7 +91,7 @@ def main():
         print(connections)
         print("Connected to:", addr1, addr2)
 
-        start_new_thread(threaded_client, (conn1, conn2))
+        start_new_thread(threaded_game, (conn1, conn2))
 
 
 if __name__ == '__main__':
