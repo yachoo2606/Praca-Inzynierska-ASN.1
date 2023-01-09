@@ -1,5 +1,3 @@
-import pprint
-
 import pygame
 import asn1tools
 import numpy as np
@@ -136,21 +134,21 @@ class Board:
                         else:
                             return False
 
-    def set_o_around(self, row, col):
+    def set_o_around(self, drawBoard, row, col):
         for i in range(3):
             for j in range(3):
                 if 0 <= (row - 1 + i) < 10 and 0 <= (col - 1 + j) < 10:
-                    if self.board[row - 1 + i][col - 1 + j] != 3:
-                        self.board[row - 1 + i][col - 1 + j] = 4
+                    if drawBoard[row - 1 + i][col - 1 + j] != 3:
+                        drawBoard[row - 1 + i][col - 1 + j] = 4
         if row - 1 >= 0:
-            if self.board[row - 1][col] == 3:
-                self.set_o_around(row - 1, col)
+            if drawBoard[row - 1][col] == 3:
+                self.set_o_around(drawBoard, row - 1, col)
             elif col - 1 >= 0:
                 if self.board[row][col - 1] == 3:
-                    self.set_o_around(row, col - 1)
+                    drawBoard(row, col - 1)
 
     def search_first(self, row, col):
-        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 2:
+        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 4 and self.board[row - 1][col] != 0:
             if self.board[row - 1][col] == 1:
                 return False
             elif self.board[row - 1][col] == 3:
@@ -161,7 +159,7 @@ class Board:
             elif self.board[row][col - 1] == 3:
                 self.search_first(row, col - 1)
         else:
-            self.check_full_destroy(row, col)
+            return self.check_full_destroy(row, col)
 
     def check_full_destroy(self, row, col):
         ship_check = True
@@ -176,7 +174,8 @@ class Board:
             elif self.board[row][col + 1] == 3:
                 ship_check = self.check_full_destroy(row, col + 1)
         if ship_check:
-            self.set_o_around(row, col)
+            self.set_o_around(self.board, row, col)
+            return ship_check
 
     def shoot_the_enemy(self, mx, my):
         # print(self.board)
@@ -199,6 +198,8 @@ class Board:
     def enemyCheckHit(self, enemyTarget):
         if enemyTarget['hit']:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 3
+            if enemyTarget['sunk']:
+                self.set_o_around(self.enemy_board, enemyTarget['row'], enemyTarget['column'])
             self.enemy_ships_left -= 1
         else:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 4
@@ -221,19 +222,26 @@ class Board:
                 self.log_box.log_to_draw.append("Data received from second player: " + str(data))
                 self.log_box.log_to_draw.append(f"requested data : {requested_Data}")
                 if self.board[requested_Data['row']][requested_Data['column']] == 1:
+                    self.board[requested_Data['row']][requested_Data['column']] = 3
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': True, 'column': requested_Data['column'], 'row': requested_Data['row']})
+                                        {'hit': True,
+                                         'column': requested_Data['column'],
+                                         'row': requested_Data['row'],
+                                         'sunk': self.search_first(requested_Data['row'], requested_Data['column'])
+                                         })
                     )
                     hitSound.play()
-                    self.board[requested_Data['row']][requested_Data['column']] = 3
-                    self.search_first(requested_Data['row'], requested_Data['column'])
                     self.your_ships_left -= 1
                 else:
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': False, 'column': requested_Data['column'],
-                                         'row': requested_Data['row']})
+                                        {
+                                            'hit': False,
+                                            'column': requested_Data['column'],
+                                            'row': requested_Data['row'],
+                                            'sunk': False
+                                        })
                     )
                     self.board[requested_Data['row']][requested_Data['column']] = 4
                     missSound.play()
