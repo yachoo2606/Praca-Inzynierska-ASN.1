@@ -137,36 +137,34 @@ class Board:
                             return False
 
     def set_o_around(self, row, col):
+        for i in range(3):
+            for j in range(3):
+                if 0 <= (row - 1 + i) < 10 and 0 <= (col - 1 + j) < 10:
+                    if self.board[row - 1 + i][col - 1 + j] != 3:
+                        self.board[row - 1 + i][col - 1 + j] = 4
         if row - 1 >= 0:
             if self.board[row - 1][col] == 3:
                 self.set_o_around(row - 1, col)
             elif col - 1 >= 0:
                 if self.board[row][col - 1] == 3:
                     self.set_o_around(row, col - 1)
-        if row + 1 < 10:
-            if self.board[row + 1][col] == 3:
-                self.set_o_around(row + 1, col)
-        if col + 1 < 10:
-            if self.board[row][col + 1] == 3:
-                self.set_o_around(row, col + 1)
-        for i in range(3):
-            for j in range(3):
-                if 0 <= (row - 1 + i) < 10 and 0 <= (col - 1 + j) < 10:
-                    if self.board[row - 1 + i][col - 1 + j] != 3:
-                        self.board[row - 1 + i][col - 1 + j] = 4
 
-    def check_full_destroy(self, row, col):
-        ship_check = True
-        if row - 1 >= 0:
+    def search_first(self, row, col):
+        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 2:
             if self.board[row - 1][col] == 1:
                 return False
             elif self.board[row - 1][col] == 3:
-                ship_check = self.check_full_destroy(row - 1, col)
-            elif col - 1 >= 0:
-                if self.board[row][col - 1] == 1:
-                    return False
-                elif self.board[row][col - 1] == 3:
-                    ship_check = self.check_full_destroy(row, col - 1)
+                self.search_first(row - 1, col)
+        elif col - 1 >= 0 and self.board[row][col - 1] != 2 and self.board[row][col - 1] != 4:
+            if self.board[row][col - 1] == 1:
+                return False
+            elif self.board[row][col - 1] == 3:
+                self.search_first(row, col - 1)
+        else:
+            self.check_full_destroy(row, col)
+
+    def check_full_destroy(self, row, col):
+        ship_check = True
         if row + 1 < 10 and ship_check:
             if self.board[row + 1][col] == 1:
                 return False
@@ -229,7 +227,7 @@ class Board:
                     )
                     hitSound.play()
                     self.board[requested_Data['row']][requested_Data['column']] = 3
-                    self.check_full_destroy(requested_Data['row'], requested_Data['column'])
+                    self.search_first(requested_Data['row'], requested_Data['column'])
                     self.your_ships_left -= 1
                 else:
                     self.network.client.send(
