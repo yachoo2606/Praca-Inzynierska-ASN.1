@@ -160,7 +160,7 @@ def set_mode(val, test):
     mode = val[0]
 
 
-def play_press_sound():
+def play_press_sound(val):
     pressSound.play()
     # pass
 
