@@ -19,6 +19,7 @@ asn = asn1tools.compile_files("asn1/modules.asn")
 mixer.init()
 backSound = mixer.Sound("music/pirate-music-14288.mp3")
 backSound.play(loops=-1)
+backSound.set_volume(0.5)
 pressSound = mixer.Sound("music/pressSound2.ogg")
 
 mode = ('Solo', 0)
