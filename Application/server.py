@@ -1,8 +1,12 @@
+import platform
 import socket
 from _thread import *
 import asn1tools
 
-server = "127.0.0.1"
+hostname = socket.gethostname()
+server = socket.gethostbyname(hostname)
+
+# server = "0.0.0.0"
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 asn = asn1tools.compile_files("asn1/modules.asn")
@@ -13,9 +17,9 @@ connections = []
 
 try:
     s.bind((server, port))
-    print(f"Server Lan IP: {socket.gethostbyname(socket.gethostname())}")
+    print(f"Server Lan IP: {server}")
 except socket.error as e:
-    str(e)
+    print(str(e))
 
 s.listen(2)
 print("Waiting for connection, Server Started")
