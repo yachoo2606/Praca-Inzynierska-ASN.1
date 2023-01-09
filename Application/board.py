@@ -188,25 +188,16 @@ class Board:
         ship_check = True
         if row + 1 < 10 and ship_check:
             if self.board[row + 1][col] == 1:
-                print("----------------------------------------------------------------------")
-                print("test False")
-                print("----------------------------------------------------------------------")
                 return False
             elif self.board[row + 1][col] == 3:
                 ship_check = self.check_full_destroy(row + 1, col)
         if col + 1 < 10 and ship_check:
             if self.board[row][col + 1] == 1:
-                print("----------------------------------------------------------------------")
-                print("test False2")
-                print("----------------------------------------------------------------------")
                 return False
             elif self.board[row][col + 1] == 3:
                 ship_check = self.check_full_destroy(row, col + 1)
         if ship_check:
             self.set_o_around(row, col)
-        print("----------------------------------------------------------------------")
-        print(ship_check)
-        print("----------------------------------------------------------------------")
         return ship_check
 
     def check_full_destroy_enemy(self, row, col):
@@ -226,7 +217,6 @@ class Board:
         return ship_check
 
     def shoot_the_enemy(self, mx, my):
-        # print(self.board)
         for row in range(BOARD_ROWS):
             for col in range(BOARD_COLS):
                 if (750 + 50 * row) < mx < (800 + 50 * row) and (100 + 50 * col) < my < (150 + 50 * col):
@@ -235,21 +225,20 @@ class Board:
                         encode_print = f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}"
                         print(encode_print)
                         self.log_box.log_to_draw.append(encode_print)
+                        self.log_box.log_to_draw.append(f"'Request', column: {col}, 'row': {row})")
                         enemy_board_Data = self.network.send(self.asn.encode('Request', {'column': col, 'row': row}))
 
                         self.myNumber = not self.myNumber
-
+                        self.log_box.log_to_draw.append(f"Response encoded: {enemy_board_Data}")
                         enemy_board_Data = self.asn.decode('Response', enemy_board_Data)
 
+                        self.log_box.log_to_draw.append(f"Response decoded: {enemy_board_Data}")
                         self.enemyCheckHit(enemy_board_Data)
 
     def enemyCheckHit(self, enemyTarget):
         if enemyTarget['hit']:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 3
             if enemyTarget['sunk']:
-                print("----------------------------------------------------------------------")
-                print(enemyTarget['sunk'], "sunk")
-                print("----------------------------------------------------------------------")
                 self.search_first_enemy(enemyTarget['row'], enemyTarget['column'])
             self.enemy_ships_left -= 1
         else:
