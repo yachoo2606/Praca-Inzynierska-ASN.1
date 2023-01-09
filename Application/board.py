@@ -274,16 +274,12 @@ class Board:
                 self.log_box.log_to_draw.append(f"requested data : {requested_Data}")
                 if self.board[requested_Data['row']][requested_Data['column']] == 1:
                     self.board[requested_Data['row']][requested_Data['column']] = 3
-                    test = self.search_first(requested_Data['row'], requested_Data['column'])
-                    print("----------------------------------------------------------------------")
-                    print(test, "zwrot search_first")
-                    print("----------------------------------------------------------------------")
                     self.network.client.send(
                         self.asn.encode('Response',
                                         {'hit': True,
                                          'column': requested_Data['column'],
                                          'row': requested_Data['row'],
-                                         'sunk': test
+                                         'sunk': self.search_first(requested_Data['row'], requested_Data['column'])
                                          })
                     )
                     hitSound.play()
