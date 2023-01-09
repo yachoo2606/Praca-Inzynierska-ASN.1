@@ -14,7 +14,8 @@ Requests DEFINITIONS ::= BEGIN
     Response ::= SEQUENCE{
         column     INTEGER,
         row        INTEGER,
-        hit        BOOLEAN
+        hit        BOOLEAN,
+        sunk       BOOLEAN
     }
 
     Ready ::= SEQUENCE{

@@ -1,5 +1,3 @@
-import pprint
-
 import pygame
 import asn1tools
 import numpy as np
@@ -149,34 +147,83 @@ class Board:
                 if self.board[row][col - 1] == 3:
                     self.set_o_around(row, col - 1)
 
+    def set_o_around_enemy(self, row, col):
+        for i in range(3):
+            for j in range(3):
+                if 0 <= (row - 1 + i) < 10 and 0 <= (col - 1 + j) < 10:
+                    if self.enemy_board[row - 1 + i][col - 1 + j] != 3:
+                        self.enemy_board[row - 1 + i][col - 1 + j] = 4
+        if row - 1 >= 0:
+            if self.enemy_board[row - 1][col] == 3:
+                self.set_o_around_enemy(row - 1, col)
+            elif col - 1 >= 0:
+                if self.enemy_board[row][col - 1] == 3:
+                    self.set_o_around_enemy(row, col - 1)
+
     def search_first(self, row, col):
-        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 2:
+        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 4 and self.board[row - 1][col] != 0:
             if self.board[row - 1][col] == 1:
                 return False
             elif self.board[row - 1][col] == 3:
-                self.search_first(row - 1, col)
-        elif col - 1 >= 0 and self.board[row][col - 1] != 2 and self.board[row][col - 1] != 4:
+                return self.search_first(row - 1, col)
+        elif col - 1 >= 0 and self.board[row][col - 1] != 2 and self.board[row][col - 1] != 4 and self.board[row - 1][col] != 0:
             if self.board[row][col - 1] == 1:
                 return False
             elif self.board[row][col - 1] == 3:
-                self.search_first(row, col - 1)
+                return self.search_first(row, col - 1)
         else:
-            self.check_full_destroy(row, col)
+            return self.check_full_destroy(row, col)
+
+    def search_first_enemy(self, row, col):
+        if row - 1 >= 0 and self.enemy_board[row - 1][col] != 4 and self.enemy_board[row - 1][col] != 0:
+            if self.enemy_board[row - 1][col] == 3:
+                return self.search_first_enemy(row - 1, col)
+        elif col - 1 >= 0 and self.enemy_board[row][col - 1] != 4 and self.enemy_board[row - 1][col] != 0:
+            if self.enemy_board[row][col - 1] == 3:
+                return self.search_first_enemy(row, col - 1)
+        else:
+            return self.check_full_destroy_enemy(row, col)
 
     def check_full_destroy(self, row, col):
         ship_check = True
         if row + 1 < 10 and ship_check:
             if self.board[row + 1][col] == 1:
+                print("----------------------------------------------------------------------")
+                print("test False")
+                print("----------------------------------------------------------------------")
                 return False
             elif self.board[row + 1][col] == 3:
                 ship_check = self.check_full_destroy(row + 1, col)
         if col + 1 < 10 and ship_check:
             if self.board[row][col + 1] == 1:
+                print("----------------------------------------------------------------------")
+                print("test False2")
+                print("----------------------------------------------------------------------")
                 return False
             elif self.board[row][col + 1] == 3:
                 ship_check = self.check_full_destroy(row, col + 1)
         if ship_check:
             self.set_o_around(row, col)
+        print("----------------------------------------------------------------------")
+        print(ship_check)
+        print("----------------------------------------------------------------------")
+        return ship_check
+
+    def check_full_destroy_enemy(self, row, col):
+        ship_check = True
+        if row + 1 < 10 and ship_check:
+            if self.enemy_board[row + 1][col] == 1:
+                return False
+            elif self.enemy_board[row + 1][col] == 3:
+                ship_check = self.check_full_destroy_enemy(row + 1, col)
+        if col + 1 < 10 and ship_check:
+            if self.enemy_board[row][col + 1] == 1:
+                return False
+            elif self.enemy_board[row][col + 1] == 3:
+                ship_check = self.check_full_destroy_enemy(row, col + 1)
+        if ship_check:
+            self.set_o_around_enemy(row, col)
+        return ship_check
 
     def shoot_the_enemy(self, mx, my):
         # print(self.board)
@@ -184,7 +231,7 @@ class Board:
             for col in range(BOARD_COLS):
                 if (750 + 50 * row) < mx < (800 + 50 * row) and (100 + 50 * col) < my < (150 + 50 * col):
                     if self.enemy_board[row][col] == 0:
-                        self.enemy_board[row][col] = 1
+                        self.enemy_board[row][col] = 4
                         encode_print = f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}"
                         print(encode_print)
                         self.log_box.log_to_draw.append(encode_print)
@@ -199,6 +246,11 @@ class Board:
     def enemyCheckHit(self, enemyTarget):
         if enemyTarget['hit']:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 3
+            if enemyTarget['sunk']:
+                print("----------------------------------------------------------------------")
+                print(enemyTarget['sunk'], "sunk")
+                print("----------------------------------------------------------------------")
+                self.search_first_enemy(enemyTarget['row'], enemyTarget['column'])
             self.enemy_ships_left -= 1
         else:
             self.enemy_board[enemyTarget['row']][enemyTarget['column']] = 4
@@ -221,19 +273,30 @@ class Board:
                 self.log_box.log_to_draw.append("Data received from second player: " + str(data))
                 self.log_box.log_to_draw.append(f"requested data : {requested_Data}")
                 if self.board[requested_Data['row']][requested_Data['column']] == 1:
+                    self.board[requested_Data['row']][requested_Data['column']] = 3
+                    test = self.search_first(requested_Data['row'], requested_Data['column'])
+                    print("----------------------------------------------------------------------")
+                    print(test, "zwrot search_first")
+                    print("----------------------------------------------------------------------")
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': True, 'column': requested_Data['column'], 'row': requested_Data['row']})
+                                        {'hit': True,
+                                         'column': requested_Data['column'],
+                                         'row': requested_Data['row'],
+                                         'sunk': test
+                                         })
                     )
                     hitSound.play()
-                    self.board[requested_Data['row']][requested_Data['column']] = 3
-                    self.search_first(requested_Data['row'], requested_Data['column'])
                     self.your_ships_left -= 1
                 else:
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': False, 'column': requested_Data['column'],
-                                         'row': requested_Data['row']})
+                                        {
+                                            'hit': False,
+                                            'column': requested_Data['column'],
+                                            'row': requested_Data['row'],
+                                            'sunk': False
+                                        })
                     )
                     self.board[requested_Data['row']][requested_Data['column']] = 4
                     missSound.play()
