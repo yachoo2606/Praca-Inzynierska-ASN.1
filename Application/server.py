@@ -2,13 +2,9 @@ import platform
 import socket
 from _thread import *
 import asn1tools
+import psutil
 
-hostname = socket.gethostname()
-server = socket.gethostbyname(hostname)
-
-# server = "0.0.0.0"
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
 asn = asn1tools.compile_files("asn1/modules.asn")
 
 port = 5555
@@ -16,8 +12,13 @@ port = 5555
 connections = []
 
 try:
-    s.bind((server, port))
-    print(f"Server Lan IP: {server}")
+    s.bind(("0.0.0.0", port)) #socket.INADDR_ANY
+    print(f"Server Lan IP:")
+    for key, address in psutil.net_if_addrs().items():
+        for addr in address:
+            if addr.family == 2:
+                print(f"\t{addr.address}")
+
 except socket.error as e:
     print(str(e))
 
