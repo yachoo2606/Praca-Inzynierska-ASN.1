@@ -1,17 +1,19 @@
 Requests DEFINITIONS ::= BEGIN
 
     Connected ::= SEQUENCE{
-        message     UTF8String,
+        name     UTF8String,
         number      INTEGER,
         connected   BOOLEAN
     }
 
     Request ::= SEQUENCE{
+        name       UTF8String,
         column     INTEGER,
         row        INTEGER
     }
 
     Response ::= SEQUENCE{
+        name       UTF8String,
         column     INTEGER,
         row        INTEGER,
         hit        BOOLEAN,
@@ -19,6 +21,7 @@ Requests DEFINITIONS ::= BEGIN
     }
 
     Ready ::= SEQUENCE{
+        name      UTF8String,
         ready      BOOLEAN
     }
 

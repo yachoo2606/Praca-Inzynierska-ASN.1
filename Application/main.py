@@ -129,7 +129,7 @@ def game():
                         chosen_ship = set_ships(mx, my, chosen_ship, board, rotate)
                         if (num_ships[0] + num_ships[1] + num_ships[2] + num_ships[3]) == 0 and chosen_ship is None:
                             game_phase = not game_phase
-                            board.network.client.send(asn.encode('Ready', {'ready': True}))
+                            board.network.client.send(asn.encode('Ready', {'name':"Ready" ,'ready': True}))
 
                     if event.button == 3:
                         rotate = not rotate

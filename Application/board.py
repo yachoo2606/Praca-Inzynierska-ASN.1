@@ -211,11 +211,13 @@ class Board:
                 if (750 + 50 * row) < mx < (800 + 50 * row) and (100 + 50 * col) < my < (150 + 50 * col):
                     if self.enemy_board[row][col] == 0:
                         self.enemy_board[row][col] = 4
-                        encode_print = f"encoded asn: {self.asn.encode('Request', {'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'column': col, 'row': row}))}"
+                        encode_print = f"encoded asn: {self.asn.encode('Request', {'name': 'Request', 'column': col, 'row': row})} len= {len(self.asn.encode('Request', {'name': 'Request', 'column': col, 'row': row}))}"
                         print(encode_print)
                         self.log_box.log_to_draw.append(encode_print)
-                        self.log_box.log_to_draw.append(f"'Request', column: {col}, 'row': {row})")
-                        enemy_board_Data = self.network.send(self.asn.encode('Request', {'column': col, 'row': row}))
+                        self.log_box.log_to_draw.append(f"'Request', name: 'Request', column: {col}, 'row': {row})")
+                        enemy_board_Data = self.network.send(
+                            self.asn.encode('Request', {'name': 'Request', 'column': col, 'row': row})
+                        )
 
                         self.myNumber = not self.myNumber
                         self.log_box.log_to_draw.append(f"Response encoded: {enemy_board_Data}")
@@ -254,11 +256,13 @@ class Board:
                     self.board[requested_Data['row']][requested_Data['column']] = 3
                     self.network.client.send(
                         self.asn.encode('Response',
-                                        {'hit': True,
-                                         'column': requested_Data['column'],
-                                         'row': requested_Data['row'],
-                                         'sunk': self.search_first(requested_Data['row'], requested_Data['column'])
-                                         })
+                                        {
+                                            'name': "Response",
+                                            'hit': True,
+                                            'column': requested_Data['column'],
+                                            'row': requested_Data['row'],
+                                            'sunk': self.search_first(requested_Data['row'], requested_Data['column'])
+                                        })
                     )
                     hitSound.play()
                     self.your_ships_left -= 1
@@ -266,6 +270,7 @@ class Board:
                     self.network.client.send(
                         self.asn.encode('Response',
                                         {
+                                            'name': "Response",
                                             'hit': False,
                                             'column': requested_Data['column'],
                                             'row': requested_Data['row'],
