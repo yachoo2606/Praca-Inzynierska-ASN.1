@@ -129,7 +129,7 @@ def game():
                         chosen_ship = set_ships(mx, my, chosen_ship, board, rotate)
                         if (num_ships[0] + num_ships[1] + num_ships[2] + num_ships[3]) == 0 and chosen_ship is None:
                             game_phase = not game_phase
-                            board.network.client.send(asn.encode('Ready', {'ready': True}))
+                            board.network.client.send(asn.encode('Ready', {'name': "Ready", 'ready': True}))
 
                     if event.button == 3:
                         rotate = not rotate
@@ -170,7 +170,7 @@ def main():
 
     menu = pygame_menu.Menu('Welcome', WIDTH, HEIGHT, theme=pygame_menu.themes.THEME_BLUE)
     ADDRESS = menu.add.text_input("Address: ", default="127.0.0.1", onchange=play_press_sound)
-    menu.add.selector('Mode: ', [('Solo', 0), ('Multiplayer', 1)], onchange=set_mode)
+    # menu.add.selector('Mode: ', [('Solo', 0), ('Multiplayer', 1)], onchange=set_mode)
     menu.add.button("Play", game)
     menu.add.button("Quit", pygame_menu.events.EXIT)
 

@@ -27,9 +27,9 @@ print("Waiting for connection, Server Started")
 
 def threaded_game(conn1, conn2):
     print(f"Sent welcome data to {conn1.getpeername()}")
-    conn1.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn1), 'connected': True}))
+    conn1.send(asn.encode('Connected', {'name': "Connected", 'number': connections.index(conn1), 'connected': True}))
     print(f"Sent welcome data to {conn2.getpeername()}")
-    conn2.send(asn.encode('Connected', {'message': "Connected", 'number': connections.index(conn2), 'connected': True}))
+    conn2.send(asn.encode('Connected', {'name': "Connected", 'number': connections.index(conn2), 'connected': True}))
 
     playerTurn = 0
     player1Ready = False
@@ -47,8 +47,8 @@ def threaded_game(conn1, conn2):
                 player2Ready = True
         print(f"player1 = {bool(player1Ready)} player2 = {bool(player2Ready)}")
 
-    conn1.send(asn.encode('Ready', {'ready': True}))
-    conn2.send(asn.encode('Ready', {'ready': True}))
+    conn1.send(asn.encode('Ready', {'name': "Ready", 'ready': True}))
+    conn2.send(asn.encode('Ready', {'name': "Ready", 'ready': True}))
 
     while True:
         try:
