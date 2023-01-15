@@ -64,9 +64,6 @@ def threaded_game(conn1, conn2):
             data = connections[not playerTurn].recv(2048)
             print(data)
             print(asn.decode('Response', data))
-            # print(asn.decode('Request', data))
-            asn1Received = dict(asn.decode('Request', data))
-            print(asn1Received)
             connections[playerTurn].sendall(data)
 
             playerTurn = not playerTurn
