@@ -143,9 +143,9 @@ class Board:
         if row - 1 >= 0:
             if self.board[row - 1][col] == 3:
                 self.set_o_around(row - 1, col)
-            elif col - 1 >= 0:
-                if self.board[row][col - 1] == 3:
-                    self.set_o_around(row, col - 1)
+        elif col - 1 >= 0:
+            if self.board[row][col - 1] == 3:
+                self.set_o_around(row, col - 1)
 
     def set_o_around_enemy(self, row, col):
         for i in range(3):
@@ -153,20 +153,18 @@ class Board:
                 if 0 <= (row - 1 + i) < 10 and 0 <= (col - 1 + j) < 10:
                     if self.enemy_board[row - 1 + i][col - 1 + j] != 3:
                         self.enemy_board[row - 1 + i][col - 1 + j] = 4
-        if row - 1 >= 0:
-            if self.enemy_board[row - 1][col] == 3:
-                self.set_o_around_enemy(row - 1, col)
-            elif col - 1 >= 0:
-                if self.enemy_board[row][col - 1] == 3:
-                    self.set_o_around_enemy(row, col - 1)
+        if row - 1 >= 0 and self.enemy_board[row - 1][col] == 3:
+            self.set_o_around_enemy(row - 1, col)
+        elif col - 1 >= 0 and self.enemy_board[row][col - 1] == 3:
+            self.set_o_around_enemy(row, col - 1)
 
     def search_first(self, row, col):
-        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 4 and self.board[row - 1][col] != 0:
+        if row - 1 >= 0 and self.board[row - 1][col] != 2 and self.board[row - 1][col] != 4:
             if self.board[row - 1][col] == 1:
                 return False
             elif self.board[row - 1][col] == 3:
                 return self.search_first(row - 1, col)
-        elif col - 1 >= 0 and self.board[row][col - 1] != 2 and self.board[row][col - 1] != 4 and self.board[row - 1][col] != 0:
+        elif col - 1 >= 0 and self.board[row][col - 1] != 2 and self.board[row][col - 1] != 4:
             if self.board[row][col - 1] == 1:
                 return False
             elif self.board[row][col - 1] == 3:
@@ -175,14 +173,13 @@ class Board:
             return self.check_full_destroy(row, col)
 
     def search_first_enemy(self, row, col):
-        if row - 1 >= 0 and self.enemy_board[row - 1][col] != 4 and self.enemy_board[row - 1][col] != 0:
-            if self.enemy_board[row - 1][col] == 3:
-                return self.search_first_enemy(row - 1, col)
-        elif col - 1 >= 0 and self.enemy_board[row][col - 1] != 4 and self.enemy_board[row - 1][col] != 0:
-            if self.enemy_board[row][col - 1] == 3:
-                return self.search_first_enemy(row, col - 1)
+        print(row, col)
+        if row - 1 >= 0 and self.enemy_board[row - 1][col] == 3:
+            self.search_first_enemy(row - 1, col)
+        elif col - 1 >= 0 and self.enemy_board[row][col - 1] == 3:
+            self.search_first_enemy(row, col - 1)
         else:
-            return self.check_full_destroy_enemy(row, col)
+            self.check_full_destroy_enemy(row, col)
 
     def check_full_destroy(self, row, col):
         ship_check = True
@@ -201,20 +198,12 @@ class Board:
         return ship_check
 
     def check_full_destroy_enemy(self, row, col):
-        ship_check = True
-        if row + 1 < 10 and ship_check:
-            if self.enemy_board[row + 1][col] == 1:
-                return False
-            elif self.enemy_board[row + 1][col] == 3:
-                ship_check = self.check_full_destroy_enemy(row + 1, col)
-        if col + 1 < 10 and ship_check:
-            if self.enemy_board[row][col + 1] == 1:
-                return False
-            elif self.enemy_board[row][col + 1] == 3:
-                ship_check = self.check_full_destroy_enemy(row, col + 1)
-        if ship_check:
+        if row + 1 < 10 and self.enemy_board[row + 1][col] == 3:
+            self.check_full_destroy_enemy(row + 1, col)
+        elif col + 1 < 10 and self.enemy_board[row][col + 1] == 3:
+            self.check_full_destroy_enemy(row, col + 1)
+        else:
             self.set_o_around_enemy(row, col)
-        return ship_check
 
     def shoot_the_enemy(self, mx, my):
         for row in range(BOARD_ROWS):
@@ -286,4 +275,3 @@ class Board:
                     self.board[requested_Data['row']][requested_Data['column']] = 4
                     missSound.play()
                 self.myNumber = 0
-
