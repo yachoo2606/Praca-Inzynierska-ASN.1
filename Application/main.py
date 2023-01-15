@@ -170,7 +170,7 @@ def main():
 
     menu = pygame_menu.Menu('Welcome', WIDTH, HEIGHT, theme=pygame_menu.themes.THEME_BLUE)
     ADDRESS = menu.add.text_input("Address: ", default="127.0.0.1", onchange=play_press_sound)
-    # menu.add.selector('Mode: ', [('Solo', 0), ('Multiplayer', 1)], onchange=set_mode)
+    menu.add.selector('Mode: ', [('Solo', 0), ('Multiplayer', 1)], onchange=set_mode)
     menu.add.button("Play", game)
     menu.add.button("Quit", pygame_menu.events.EXIT)
 
