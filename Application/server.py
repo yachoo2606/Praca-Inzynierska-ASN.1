@@ -1,4 +1,3 @@
-import platform
 import socket
 from _thread import *
 import asn1tools
@@ -12,7 +11,7 @@ port = 5555
 connections = []
 
 try:
-    s.bind(("0.0.0.0", port)) #socket.INADDR_ANY
+    s.bind(("0.0.0.0", port))
     print(f"Server Lan IP:")
     for key, address in psutil.net_if_addrs().items():
         for addr in address:
