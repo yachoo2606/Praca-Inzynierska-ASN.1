@@ -254,29 +254,34 @@ class Board:
                 self.log_box.log_to_draw.append(f"requested data : {requested_Data}")
                 if self.board[requested_Data['row']][requested_Data['column']] == 1:
                     self.board[requested_Data['row']][requested_Data['column']] = 3
-                    self.network.client.send(
-                        self.asn.encode('Response',
-                                        {
-                                            'name': "Response",
-                                            'hit': True,
-                                            'column': requested_Data['column'],
-                                            'row': requested_Data['row'],
-                                            'sunk': self.search_first(requested_Data['row'], requested_Data['column'])
-                                        })
-                    )
+                    encodedDataToSend = self.asn.encode('Response',
+                                                        {
+                                                            'name': "Response",
+                                                            'hit': True,
+                                                            'column': requested_Data['column'],
+                                                            'row': requested_Data['row'],
+                                                            'sunk': self.search_first(requested_Data['row'],
+                                                                                      requested_Data['column'])
+                                                        })
+                    self.log_box.log_to_draw.append(
+                        f"Decoded Response to send: {self.asn.decode('Response', encodedDataToSend)}")
+                    self.log_box.log_to_draw.append(f"Encoded Response to send: {encodedDataToSend}")
+                    self.network.client.send(encodedDataToSend)
                     hitSound.play()
                     self.your_ships_left -= 1
                 else:
-                    self.network.client.send(
-                        self.asn.encode('Response',
-                                        {
-                                            'name': "Response",
-                                            'hit': False,
-                                            'column': requested_Data['column'],
-                                            'row': requested_Data['row'],
-                                            'sunk': False
-                                        })
-                    )
+                    encodedDataToSend = self.asn.encode('Response',
+                                                        {
+                                                            'name': "Response",
+                                                            'hit': False,
+                                                            'column': requested_Data['column'],
+                                                            'row': requested_Data['row'],
+                                                            'sunk': False
+                                                        })
+                    self.log_box.log_to_draw.append(
+                        f"Decoded Response to send: {self.asn.decode('Response', encodedDataToSend)}")
+                    self.log_box.log_to_draw.append(f"Encoded Response to send: {encodedDataToSend}")
+                    self.network.client.send(encodedDataToSend)
                     self.board[requested_Data['row']][requested_Data['column']] = 4
                     missSound.play()
                 self.myNumber = 0
