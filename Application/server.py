@@ -8,8 +8,6 @@ asn = asn1tools.compile_files("asn1/modules.asn")
 
 port = 5555
 
-connections = []
-
 try:
     s.bind(("0.0.0.0", port))
     print(f"Server Lan IP:")
@@ -26,6 +24,7 @@ print("Waiting for connection, Server Started")
 
 
 def threaded_game(conn1, conn2):
+    connections = [conn1, conn2]
     print(f"Sent welcome data to {conn1.getpeername()}")
     conn1.send(asn.encode('Connected', {'name': "Connected", 'number': connections.index(conn1), 'connected': True}))
     print(f"Sent welcome data to {conn2.getpeername()}")
@@ -85,11 +84,7 @@ def threaded_game(conn1, conn2):
 def main():
     while True:
         conn1, addr1 = s.accept()
-        connections.append(conn1)
-        print(connections)
         conn2, addr2 = s.accept()
-        connections.append(conn2)
-        print(connections)
         print("Connected to:", addr1, addr2)
 
         start_new_thread(threaded_game, (conn1, conn2))
