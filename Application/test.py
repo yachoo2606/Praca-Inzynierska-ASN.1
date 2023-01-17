@@ -6,16 +6,24 @@ from log_box import LogBox
 
 
 class TestBoard(unittest.TestCase):
-    def test_check_full_destroy_oneElementShip(self):
-        """
-        Test that checking for sunk the one element ship
-        """
+    board = None
 
+    @classmethod
+    def setUpClass(cls):
         # WIN, ADDRESS.get_value(), log_box
         WIN = pygame.display.set_mode((WIDTH, HEIGHT))
         log_box = LogBox(WIN)
 
-        self.board = Board(WIN, "127.0.0.1", log_box)
+        cls.board = Board(WIN, "127.0.0.1", log_box)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.shared_resource = None
+
+    def test_check_full_destroy_oneElementShip(self):
+        """
+        Test that checking for sunk the one element ship
+        """
 
         self.board.board[0][1] = 1
         self.board.board[0][0] = 2
@@ -30,12 +38,6 @@ class TestBoard(unittest.TestCase):
         """
         Test that checking for not sunk the ship two element ship
         """
-
-        # WIN, ADDRESS.get_value(), log_box
-        WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-        log_box = LogBox(WIN)
-
-        self.board = Board(WIN, "127.0.0.1", log_box)
 
         self.board.board[0][1] = 1
         self.board.board[0][2] = 1
@@ -53,12 +55,6 @@ class TestBoard(unittest.TestCase):
         Test that checking for not sunk the ship two element ship
         """
 
-        # WIN, ADDRESS.get_value(), log_box
-        WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-        log_box = LogBox(WIN)
-
-        self.board = Board(WIN, "127.0.0.1", log_box)
-
         self.board.board[0][1] = 1
         self.board.board[0][2] = 3
         self.board.board[0][0] = 2
@@ -74,12 +70,6 @@ class TestBoard(unittest.TestCase):
         """
         Test that checking for not sunk the ship two element ship
         """
-
-        # WIN, ADDRESS.get_value(), log_box
-        WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-        log_box = LogBox(WIN)
-
-        self.board = Board(WIN, "127.0.0.1", log_box)
 
         self.board.board[0][1] = 1
         self.board.board[1][1] = 1
@@ -97,12 +87,6 @@ class TestBoard(unittest.TestCase):
         """
         Test that checking for not sunk the ship two element ship
         """
-
-        # WIN, ADDRESS.get_value(), log_box
-        WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-        log_box = LogBox(WIN)
-
-        self.board = Board(WIN, "127.0.0.1", log_box)
 
         self.board.board[0][1] = 1
         self.board.board[1][1] = 3
