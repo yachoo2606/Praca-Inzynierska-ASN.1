@@ -36,7 +36,7 @@ class TestBoard(unittest.TestCase):
 
     def test_check_full_destroy_twoElementShip_noSunk_horizontal(self):
         """
-        Test that checking for not sunk the ship two element ship
+        Test that checking for not sunk the two element ship
         """
 
         self.board.board[0][1] = 1
@@ -52,7 +52,7 @@ class TestBoard(unittest.TestCase):
 
     def test_check_full_destroy_twoElementShip_sunk_horizontal(self):
         """
-        Test that checking for not sunk the ship two element ship
+        Test that checking for not sunk the two element ship
         """
 
         self.board.board[0][1] = 1
@@ -68,7 +68,7 @@ class TestBoard(unittest.TestCase):
 
     def test_check_full_destroy_twoElementShip_noSunk_vertical(self):
         """
-        Test that checking for not sunk the ship two element ship
+        Test that checking for not sunk the two element ship
         """
 
         self.board.board[0][1] = 1
@@ -85,7 +85,7 @@ class TestBoard(unittest.TestCase):
 
     def test_check_full_destroy_twoElementShip_sunk_vertical(self):
         """
-        Test that checking for not sunk the ship two element ship
+        Test that checking for not sunk the two element ship
         """
 
         self.board.board[0][1] = 1
