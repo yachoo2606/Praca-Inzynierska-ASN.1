@@ -8,17 +8,14 @@ from log_box import LogBox
 class TestBoard(unittest.TestCase):
     board = None
 
-    @classmethod
-    def setUpClass(cls):
-        # WIN, ADDRESS.get_value(), log_box
+    def setUp(self):
         WIN = pygame.display.set_mode((WIDTH, HEIGHT))
         log_box = LogBox(WIN)
 
-        cls.board = Board(WIN, "127.0.0.1", log_box)
+        self.board = Board(WIN, "127.0.0.1", log_box)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.shared_resource = None
+    def tearDown(self):
+        self.board = None
 
     def test_check_full_destroy_oneElementShip(self):
         """
