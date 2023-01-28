@@ -22,12 +22,12 @@ class TestBoard(unittest.TestCase):
         Test that checking for sunk the one element ship
         """
 
-        self.board.board[0][1] = 1
-        self.board.board[0][0] = 2
-        self.board.board[1][0] = 2
-        self.board.board[1][1] = 2
-        self.board.board[1][2] = 2
-        self.board.board[0][3] = 2
+        self.board.board[0][1] = SHIP_FIELD
+        self.board.board[0][0] = WATER_FIELD
+        self.board.board[1][0] = WATER_FIELD
+        self.board.board[1][1] = WATER_FIELD
+        self.board.board[1][2] = WATER_FIELD
+        self.board.board[0][3] = WATER_FIELD
 
         self.assertTrue(self.board.check_full_destroy(0, 1), "Should be True")
 
@@ -36,14 +36,14 @@ class TestBoard(unittest.TestCase):
         Test that checking for not sunk the two element ship
         """
 
-        self.board.board[0][1] = 1
-        self.board.board[0][2] = 1
-        self.board.board[0][0] = 2
-        self.board.board[1][0] = 2
-        self.board.board[1][1] = 2
-        self.board.board[1][2] = 2
-        self.board.board[1][3] = 2
-        self.board.board[0][3] = 2
+        self.board.board[0][1] = SHIP_FIELD
+        self.board.board[0][2] = SHIP_FIELD
+        self.board.board[0][0] = WATER_FIELD
+        self.board.board[1][0] = WATER_FIELD
+        self.board.board[1][1] = WATER_FIELD
+        self.board.board[1][2] = WATER_FIELD
+        self.board.board[1][3] = WATER_FIELD
+        self.board.board[0][3] = WATER_FIELD
 
         self.assertFalse(self.board.check_full_destroy(0, 1), "Should be False")
 
@@ -52,14 +52,14 @@ class TestBoard(unittest.TestCase):
         Test that checking for not sunk the two element ship
         """
 
-        self.board.board[0][1] = 1
-        self.board.board[0][2] = 3
-        self.board.board[0][0] = 2
-        self.board.board[1][0] = 2
-        self.board.board[1][1] = 2
-        self.board.board[1][2] = 2
-        self.board.board[1][3] = 2
-        self.board.board[0][3] = 2
+        self.board.board[0][1] = SHIP_FIELD
+        self.board.board[0][2] = SHIP_HIT
+        self.board.board[0][0] = WATER_FIELD
+        self.board.board[1][0] = WATER_FIELD
+        self.board.board[1][1] = WATER_FIELD
+        self.board.board[1][2] = WATER_FIELD
+        self.board.board[1][3] = WATER_FIELD
+        self.board.board[0][3] = WATER_FIELD
 
         self.assertTrue(self.board.check_full_destroy(0, 1), "Should be True")
 
@@ -68,15 +68,15 @@ class TestBoard(unittest.TestCase):
         Test that checking for not sunk the two element ship
         """
 
-        self.board.board[0][1] = 1
-        self.board.board[1][1] = 1
-        self.board.board[0][0] = 2
-        self.board.board[1][0] = 2
-        self.board.board[2][0] = 2
-        self.board.board[2][1] = 2
-        self.board.board[2][2] = 2
-        self.board.board[1][2] = 2
-        self.board.board[0][2] = 2
+        self.board.board[0][1] = SHIP_FIELD
+        self.board.board[1][1] = SHIP_FIELD
+        self.board.board[0][0] = WATER_FIELD
+        self.board.board[1][0] = WATER_FIELD
+        self.board.board[2][0] = WATER_FIELD
+        self.board.board[2][1] = WATER_FIELD
+        self.board.board[2][2] = WATER_FIELD
+        self.board.board[1][2] = WATER_FIELD
+        self.board.board[0][2] = WATER_FIELD
 
         self.assertFalse(self.board.check_full_destroy(0, 1), "Should be False")
 
@@ -85,15 +85,15 @@ class TestBoard(unittest.TestCase):
         Test that checking for not sunk the two element ship
         """
 
-        self.board.board[0][1] = 1
-        self.board.board[1][1] = 3
-        self.board.board[0][0] = 2
-        self.board.board[1][0] = 2
-        self.board.board[2][0] = 2
-        self.board.board[2][1] = 2
-        self.board.board[2][2] = 2
-        self.board.board[1][2] = 2
-        self.board.board[0][2] = 2
+        self.board.board[0][1] = SHIP_FIELD
+        self.board.board[1][1] = SHIP_HIT
+        self.board.board[0][0] = WATER_FIELD
+        self.board.board[1][0] = WATER_FIELD
+        self.board.board[2][0] = WATER_FIELD
+        self.board.board[2][1] = WATER_FIELD
+        self.board.board[2][2] = WATER_FIELD
+        self.board.board[1][2] = WATER_FIELD
+        self.board.board[0][2] = WATER_FIELD
 
         self.assertTrue(self.board.check_full_destroy(0, 1), "Should be True")
 

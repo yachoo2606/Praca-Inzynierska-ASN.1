@@ -14,10 +14,15 @@ LINE_COLOR = (255, 255, 255)
 AVAILABLE_COLOR = (0, 255, 0)
 UNAVAILABLE_COLOR = (255, 0, 0)
 MISS_COLOR = (0, 0, 0)
+
 # letters
 LETTERS = "ABCDEFGHIJXO"
 NUMBERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 FONT = pygame.font.SysFont('comicssans', 60)
+
+SHIP_FIELD = 1
+SHIP_HIT = 3
+WATER_FIELD = 2
 
 # assets
 SHIP1UP = pygame.transform.scale(pygame.image.load("ships/ship1.png"), (40, 40))
