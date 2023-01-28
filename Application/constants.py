@@ -20,9 +20,11 @@ LETTERS = "ABCDEFGHIJXO"
 NUMBERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 FONT = pygame.font.SysFont('comicssans', 60)
 
+WATER_FIELD = 0
 SHIP_FIELD = 1
+RESERVED_FIELD = 2
 SHIP_HIT = 3
-WATER_FIELD = 2
+MISS_FIELD = 4
 
 # assets
 SHIP1UP = pygame.transform.scale(pygame.image.load("ships/ship1.png"), (40, 40))
