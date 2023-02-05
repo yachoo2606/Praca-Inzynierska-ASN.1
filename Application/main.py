@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import pygame_menu
 from constants import WIDTH, HEIGHT, FONT, LINE_COLOR, SHIP4SIDE, SHIP3SIDE, SHIP2SIDE, SHIP1SIDE, AVAILABLE_COLOR, \
@@ -126,6 +128,23 @@ def game():
                             board.your_ships_left = 0
                         if 100 > mx > 50 > my > 0:
                             board.enemy_ships_left = 0
+                        if 100 < mx < 150 and 0 < my < 50:
+                            while num_ships[0] != 0:
+                                rotate = random.choice([True, False])
+                                chosen_ship = set_ships(440, 710, chosen_ship, board, rotate)
+                                chosen_ship = set_ships(random.randint(0, 9) * 50 + 125, random.randint(0, 9) * 50 + 125, chosen_ship, board, rotate)
+                            while num_ships[1] != 0:
+                                rotate = random.choice([True, False])
+                                chosen_ship = set_ships(440, 660, chosen_ship, board, rotate)
+                                chosen_ship = set_ships(random.randint(0, 9) * 50 + 125, random.randint(0, 9) * 50 + 125, chosen_ship, board, rotate)
+                            while num_ships[2] != 0:
+                                rotate = random.choice([True, False])
+                                chosen_ship = set_ships(140, 710, chosen_ship, board, rotate)
+                                chosen_ship = set_ships(random.randint(0, 9) * 50 + 125, random.randint(0, 9) * 50 + 125, chosen_ship, board, rotate)
+                            while num_ships[3] != 0:
+                                rotate = random.choice([True, False])
+                                chosen_ship = set_ships(140, 660, chosen_ship, board, rotate)
+                                chosen_ship = set_ships(random.randint(0, 9) * 50 + 125, random.randint(0, 9) * 50 + 125, chosen_ship, board, rotate)
                         chosen_ship = set_ships(mx, my, chosen_ship, board, rotate)
                         if (num_ships[0] + num_ships[1] + num_ships[2] + num_ships[3]) == 0 and chosen_ship is None:
                             game_phase = not game_phase
@@ -137,6 +156,10 @@ def game():
                 if not waiting:
                     if turn == 0 and not_end_game:
                         if event.type == pygame.MOUSEBUTTONDOWN:
+                            if 0 < mx < 50 and 0 < my < 50:
+                                board.your_ships_left = 0
+                            if 100 > mx > 50 > my > 0:
+                                board.enemy_ships_left = 0
                             if 750 < mx < 1250 and 100 < my < 600:
                                 board.shoot_the_enemy(mx, my)
 
